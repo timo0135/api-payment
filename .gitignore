@@ -8,7 +8,7 @@
 *.zip
 *.tar.gz
 *.rar
-
+API-payment/data
 # Maven
 target/
 pom.xml.tag
