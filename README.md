@@ -3,7 +3,7 @@
 Microservice REST développé avec Spring Boot pour la gestion des paiements dans une architecture microservices.
 Ce service communique avec les autres services du système (reservations).
 
-Les specs communes des APIs sont dans le fichier TML.yml ainsi que les schémas des dépendances fais en cours qui sont dans les fichiers specs.png
+Les specs communes des APIs sont dans le fichier TML.yml ainsi que les schémas des dépendances fais en cours qui sont dans les fichiers specs.pdf
 
 ---
 
