@@ -1,0 +1,564 @@
+openapi: 3.1.0
+info:
+  title: gateway-api
+  description: API Gateway regroupant user_api, reservation_api et payement_api.
+  version: 1.0.0
+
+servers:
+  - url: http://info-tpsi.univ-brest.fr:10058/payments
+
+tags:
+  - name: payement_api
+    description: Gestion des paiements
+  - name: user_api
+    description: Gestion des utilisateurs
+  - name: reservation_api
+    description: Gestion des réservations
+
+paths:
+  /payments:
+    get:
+      tags: [payement_api]
+      summary: Liste tous les paiements
+      description: Renvoie une liste de tous les paiements.
+      responses:
+        "200":
+          description: Collection de paiements
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  type:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Payment"
+    post:
+      tags: [payement_api]
+      summary: Crée un paiement
+      description: Ajoute un nouveau paiement.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentCreate"
+      responses:
+        "201":
+          description: Paiement créé
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  type:
+                    type: string
+                  data:
+                    $ref: "#/components/schemas/Payment"
+        "400":
+          description: Requête invalide
+
+  /payments/{id}:
+    get:
+      tags: [payement_api]
+      summary: Récupère un paiement
+      description: Renvoie un paiement via son id.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identifiant du paiement
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Paiement (objet)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  type:
+                    type: string
+                  data:
+                    $ref: "#/components/schemas/Payment"
+        "404":
+          description: Paiement non trouvé
+    delete:
+      tags: [payement_api]
+      summary: Supprime un paiement
+      description: Supprime un paiement via son id.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identifiant du paiement
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Paiement supprimé
+        "404":
+          description: Paiement non trouvé
+
+  /payments/{id}:
+    patch:
+      tags: [payement_api]
+      summary: Met à jour le status d'un paiement
+      description: Met à jour uniquement le status d'un paiement.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identifiant du paiement
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentStatusPatch"
+      responses:
+        "201":
+          description: Status mis à jour
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  type:
+                    type: string
+                  data:
+                    $ref: "#/components/schemas/Payment"
+        "400":
+          description: Requête invalide
+        "404":
+          description: Paiement non trouvé
+
+  /users:
+    get:
+      tags: [user_api]
+      summary: Liste tous les utilisateurs
+      description: Renvoie une liste de tous les utilisateurs.
+      responses:
+        "200":
+          description: Collection d'utilisateurs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+    post:
+      tags: [user_api]
+      summary: Crée un utilisateur
+      description: Ajoute un nouvel utilisateur.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreate"
+      responses:
+        "201":
+          description: Utilisateur créé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Requête invalide
+
+  /users/{id}:
+    get:
+      tags: [user_api]
+      summary: Récupère un utilisateur
+      description: Renvoie un utilisateur via son id.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identifiant de l'utilisateur
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Utilisateur (objet)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Utilisateur non trouvé
+    put:
+      tags: [user_api]
+      summary: Met à jour un utilisateur
+      description: Met à jour un utilisateur via son id.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identifiant de l'utilisateur
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        "201":
+          description: Utilisateur mis à jour
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Requête invalide
+        "404":
+          description: Utilisateur non trouvé
+    delete:
+      tags: [user_api]
+      summary: Supprime un utilisateur
+      description: Supprime un utilisateur via son id.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identifiant de l'utilisateur
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Utilisateur supprimé
+        "404":
+          description: Utilisateur non trouvé
+
+  /reservations:
+    get:
+      tags: [reservation_api]
+      summary: Liste toutes les réservations
+      description: Renvoie une liste de toutes les réservations.
+      responses:
+        "200":
+          description: Collection de réservations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Reservation"
+    post:
+      tags: [reservation_api]
+      summary: Crée une réservation
+      description: Ajoute une nouvelle réservation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReservationCreate"
+      responses:
+        "201":
+          description: Réservation créée
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+        "400":
+          description: Requête invalide
+
+  /reservations/{id}:
+    get:
+      tags: [reservation_api]
+      summary: Récupère une réservation
+      description: Renvoie une réservation via son id.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identifiant de la réservation
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Réservation (objet)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+        "404":
+          description: Réservation non trouvée
+    put:
+      tags: [reservation_api]
+      summary: Met à jour une réservation
+      description: Met à jour une réservation via son id.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identifiant de la réservation
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReservationUpdate"
+      responses:
+        "201":
+          description: Réservation mise à jour
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Reservation"
+        "400":
+          description: Requête invalide
+        "404":
+          description: Réservation non trouvée
+    delete:
+      tags: [reservation_api]
+      summary: Supprime une réservation
+      description: Supprime une réservation via son id.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identifiant de la réservation
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Réservation supprimée
+        "404":
+          description: Réservation non trouvée
+
+  /reservations/{id}/payments:
+    get:
+      tags: [reservation_api]
+      summary: Liste les paiements d'une réservation
+      description: Renvoie les paiements associés à une réservation.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identifiant de la réservation
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Collection de paiements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Payment"
+        "404":
+          description: Réservation non trouvée
+
+  /reservations/{id}/movies:
+    get:
+      tags: [reservation_api]
+      summary: Récupère les films d'une réservation
+      description: Renvoie les films liés à une réservation.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identifiant de la réservation
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Films (objet)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MoviesForReservation"
+        "404":
+          description: Réservation non trouvée
+
+  /reservations/{id}/reviews:
+    get:
+      tags: [reservation_api]
+      summary: Récupère les reviews d'une réservation
+      description: Renvoie les reviews liées à une réservation.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Identifiant de la réservation
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Reviews (objet)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReviewsForReservation"
+        "404":
+          description: Réservation non trouvée
+
+components:
+  schemas:
+    # -------- PAYMENTS --------
+    Payment:
+      type: object
+      required: [id, amount, status]
+      properties:
+        id:
+          type: integer
+          description: Identifiant du paiement
+        amount:
+          type: number
+          format: decimal
+          description: Montant du paiement
+        status:
+          type: string
+          description: Statut du paiement
+      additionalProperties: false
+
+    PaymentCreate:
+      type: object
+      required: [amount, status]
+      properties:
+        amount:
+          type: number
+          format: decimal
+        status:
+          type: string
+      additionalProperties: false
+
+    PaymentStatusPatch:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+        amount:
+          type: number
+          format: decimal
+      additionalProperties: false
+
+    # -------- USERS --------
+    User:
+      type: object
+      required: [id, pseudo, nom, prenom, date_naissance, mdp, statut, adresse]
+      properties:
+        id:
+          type: integer
+          description: Identifiant de l'utilisateur
+        pseudo:
+          type: string
+        nom:
+          type: string
+        prenom:
+          type: string
+        date_naissance:
+          type: string
+          description: Date de naissance (string)
+        mdp:
+          type: string
+          description: Mot de passe (string)
+        statut:
+          type: integer
+        adresse:
+          type: string
+      additionalProperties: false
+
+    UserCreate:
+      type: object
+      required: [pseudo, nom, prenom, date_naissance, mdp, statut, adresse]
+      properties:
+        pseudo:
+          type: string
+        nom:
+          type: string
+        prenom:
+          type: string
+        date_naissance:
+          type: string
+        mdp:
+          type: string
+        statut:
+          type: integer
+        adresse:
+          type: string
+      additionalProperties: false
+
+    UserUpdate:
+      type: object
+      required: [pseudo, nom, prenom, date_naissance, mdp, statut, adresse]
+      properties:
+        pseudo:
+          type: string
+        nom:
+          type: string
+        prenom:
+          type: string
+        date_naissance:
+          type: string
+        mdp:
+          type: string
+        statut:
+          type: integer
+        adresse:
+          type: string
+      additionalProperties: false
+
+    # -------- RESERVATIONS --------
+    Reservation:
+      type: object
+      required: [id, description, date_debut, date_fin]
+      properties:
+        id:
+          type: integer
+          description: Identifiant de la réservation
+        description:
+          type: string
+        date_debut:
+          type: string
+          description: Date début (string)
+        date_fin:
+          type: string
+          description: Date fin (string)
+      additionalProperties: false
+
+    ReservationCreate:
+      type: object
+      required: [description, date_debut, date_fin]
+      properties:
+        description:
+          type: string
+        date_debut:
+          type: string
+        date_fin:
+          type: string
+      additionalProperties: false
+
+    ReservationUpdate:
+      type: object
+      required: [description, date_debut, date_fin]
+      properties:
+        description:
+          type: string
+        date_debut:
+          type: string
+        date_fin:
+          type: string
+      additionalProperties: false
